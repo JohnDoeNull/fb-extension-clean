@@ -8,6 +8,9 @@ Clean-room Chrome extension scaffold for Facebook campaign workflows.
 - Opens each target URL in sequence on schedule
 - Local-only storage (`chrome.storage.local`), **no external DB**
 - Notifications for campaign progress
+- Import/export campaigns as JSON
+- Popup run logs (persisted in local storage)
+- Optional assisted paste signal to active Facebook tab
 
 ## What this version does NOT do
 - No license bypass/cracking logic
@@ -26,9 +29,10 @@ Clean-room Chrome extension scaffold for Facebook campaign workflows.
 - `css/popup.css`
 - `js/popup.js`
 - `js/background.js`
+- `js/content.js`
 - `js/storage.js`
 
-## Next steps (if you want)
-- Add optional content script for assisted compose helpers
-- Add import/export campaigns JSON
-- Add GitHub CI zip artifact build
+## Next steps (optional)
+- Add localization
+- Add richer validation for target URL patterns
+- Add zipped release tags on GitHub

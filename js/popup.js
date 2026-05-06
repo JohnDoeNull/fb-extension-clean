@@ -1,4 +1,4 @@
-import { getCampaigns, saveCampaign, deleteCampaign } from './storage.js';
+import { getCampaigns, saveCampaign, deleteCampaign, getLogs, clearLogs } from './storage.js';
 
 const $ = (id) => document.getElementById(id);
 const statusEl = $('status');
@@ -12,6 +12,16 @@ function getForm() {
 }
 
 function setStatus(msg) { statusEl.textContent = msg; }
+
+function formatTs(ts) {
+  const d = new Date(ts);
+  return d.toLocaleTimeString();
+}
+
+async function refreshLogs() {
+  const logs = await getLogs();
+  $('logs').textContent = logs.map((l) => `[${formatTs(l.ts)}] ${l.level.toUpperCase()} ${l.message}`).join('\n');
+}
 
 async function refreshCampaigns() {
   const campaigns = await getCampaigns();
@@ -58,17 +68,73 @@ $('run').addEventListener('click', async () => {
   const data = getForm();
   if (!data.message || !data.targets.length) return setStatus('Message + targets required');
   await chrome.runtime.sendMessage({ type: 'RUN_CAMPAIGN', payload: data });
+  await refreshLogs();
   setStatus('Run started');
 });
 
 $('pause').addEventListener('click', async () => {
   await chrome.runtime.sendMessage({ type: 'PAUSE_CAMPAIGN' });
+  await refreshLogs();
   setStatus('Paused');
 });
 
 $('resume').addEventListener('click', async () => {
   await chrome.runtime.sendMessage({ type: 'RESUME_CAMPAIGN' });
+  await refreshLogs();
   setStatus('Resumed');
 });
 
+$('paste').addEventListener('click', async () => {
+  const data = getForm();
+  if (!data.message) return setStatus('Message required for assisted paste');
+  await chrome.runtime.sendMessage({ type: 'ASSISTED_PASTE', payload: { message: data.message } });
+  await refreshLogs();
+  setStatus('Paste signal sent to active tab');
+});
+
+$('clearLogs').addEventListener('click', async () => {
+  await clearLogs();
+  await refreshLogs();
+  setStatus('Logs cleared');
+});
+
+$('export').addEventListener('click', async () => {
+  const campaigns = await getCampaigns();
+  const blob = new Blob([JSON.stringify({ campaigns }, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'fb-campaigns.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  setStatus('Exported campaigns JSON');
+});
+
+$('importFile').addEventListener('change', async (e) => {
+  const f = e.target.files?.[0];
+  if (!f) return;
+  const text = await f.text();
+  let parsed;
+  try { parsed = JSON.parse(text); } catch { return setStatus('Invalid JSON file'); }
+  const incoming = parsed?.campaigns;
+  if (!incoming || typeof incoming !== 'object') return setStatus('Invalid campaigns format');
+
+  for (const [name, c] of Object.entries(incoming)) {
+    if (c && c.message && Array.isArray(c.targets)) {
+      await saveCampaign(name, {
+        name,
+        message: String(c.message),
+        targets: c.targets.map(String),
+        delaySeconds: Math.max(10, Number(c.delaySeconds || 90))
+      });
+    }
+  }
+  await refreshCampaigns();
+  setStatus('Imported campaigns');
+});
+
 refreshCampaigns();
+refreshLogs();
+setInterval(refreshLogs, 1500);

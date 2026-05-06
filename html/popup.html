@@ -13,6 +13,7 @@
     <label>Message <textarea id="message" rows="5" placeholder="Write your post..."></textarea></label>
     <label>Target URLs (one per line) <textarea id="targets" rows="4" placeholder="https://www.facebook.com/groups/...\nhttps://www.facebook.com/groups/..."></textarea></label>
     <label>Delay between targets (seconds) <input id="delay" type="number" min="10" value="90" /></label>
+
     <div class="row">
       <button id="save">Save campaign</button>
       <button id="run">Run now</button>
@@ -21,6 +22,11 @@
       <button id="pause">Pause</button>
       <button id="resume">Resume</button>
     </div>
+    <div class="row">
+      <button id="paste">Assisted paste</button>
+      <button id="clearLogs">Clear logs</button>
+    </div>
+
     <hr/>
     <h2>Saved campaigns</h2>
     <select id="campaigns"></select>
@@ -28,6 +34,15 @@
       <button id="load">Load</button>
       <button id="delete">Delete</button>
     </div>
+
+    <div class="row">
+      <button id="export">Export JSON</button>
+      <label class="fileBtn">Import JSON<input id="importFile" type="file" accept="application/json" /></label>
+    </div>
+
+    <h2>Run logs</h2>
+    <pre id="logs"></pre>
+
     <p id="status"></p>
   </main>
   <script type="module" src="../js/popup.js"></script>
