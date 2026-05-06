@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "FB Campaign Extension (Clean)",
+  "version": "0.1.0",
+  "description": "Clean-room Facebook campaign helper extension with local scheduling and safe workflows.",
+  "action": {
+    "default_title": "FB Campaign",
+    "default_popup": "html/popup.html"
+  },
+  "background": {
+    "service_worker": "js/background.js",
+    "type": "module"
+  },
+  "permissions": ["storage", "alarms", "notifications", "tabs", "activeTab"],
+  "host_permissions": [
+    "https://www.facebook.com/*",
+    "https://m.facebook.com/*",
+    "https://mbasic.facebook.com/*"
+  ],
+  "icons": {
+    "16": "icons/16.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  }
+}
