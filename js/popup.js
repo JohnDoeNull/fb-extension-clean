@@ -98,6 +98,40 @@ $('clearLogs').addEventListener('click', async () => {
   setStatus('Logs cleared');
 });
 
+$('openHome').addEventListener('click', async () => {
+  await chrome.runtime.sendMessage({ type: 'OPEN_FB_HOME' });
+  setStatus('Opened Facebook Home');
+});
+
+$('openGroups').addEventListener('click', async () => {
+  await chrome.runtime.sendMessage({ type: 'OPEN_FB_GROUPS' });
+  setStatus('Opened Facebook Groups');
+});
+
+$('openPages').addEventListener('click', async () => {
+  await chrome.runtime.sendMessage({ type: 'OPEN_FB_PAGES' });
+  setStatus('Opened Facebook Pages');
+});
+
+$('openMessages').addEventListener('click', async () => {
+  await chrome.runtime.sendMessage({ type: 'OPEN_FB_MESSAGES' });
+  setStatus('Opened Facebook Messages');
+});
+
+$('openFirstTarget').addEventListener('click', async () => {
+  const data = getForm();
+  if (!data.targets.length) return setStatus('Add at least one target URL');
+  await chrome.runtime.sendMessage({ type: 'OPEN_FIRST_TARGET', payload: data });
+  setStatus('Opened first target');
+});
+
+$('openAllTargets').addEventListener('click', async () => {
+  const data = getForm();
+  if (!data.targets.length) return setStatus('Add at least one target URL');
+  await chrome.runtime.sendMessage({ type: 'OPEN_ALL_TARGETS', payload: data });
+  setStatus('Opened all targets in tabs');
+});
+
 $('export').addEventListener('click', async () => {
   const campaigns = await getCampaigns();
   const blob = new Blob([JSON.stringify({ campaigns }, null, 2)], { type: 'application/json' });

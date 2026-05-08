@@ -73,6 +73,42 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
       }
     }
 
+    if (msg.type === 'OPEN_FB_HOME') {
+      await chrome.tabs.create({ url: 'https://www.facebook.com/' });
+      await addLog('Opened Facebook Home', 'info');
+    }
+
+    if (msg.type === 'OPEN_FB_GROUPS') {
+      await chrome.tabs.create({ url: 'https://www.facebook.com/groups/feed/' });
+      await addLog('Opened Facebook Groups feed', 'info');
+    }
+
+    if (msg.type === 'OPEN_FB_PAGES') {
+      await chrome.tabs.create({ url: 'https://www.facebook.com/pages/?category=your_pages' });
+      await addLog('Opened Facebook Pages', 'info');
+    }
+
+    if (msg.type === 'OPEN_FB_MESSAGES') {
+      await chrome.tabs.create({ url: 'https://www.facebook.com/messages/t/' });
+      await addLog('Opened Facebook Messages', 'info');
+    }
+
+    if (msg.type === 'OPEN_FIRST_TARGET') {
+      const targets = (msg.payload?.targets || []).filter(Boolean);
+      if (targets[0]) {
+        await chrome.tabs.create({ url: targets[0] });
+        await addLog(`Opened first target: ${targets[0]}`, 'info');
+      }
+    }
+
+    if (msg.type === 'OPEN_ALL_TARGETS') {
+      const targets = (msg.payload?.targets || []).filter(Boolean);
+      for (const t of targets) {
+        await chrome.tabs.create({ url: t });
+      }
+      await addLog(`Opened all targets (${targets.length})`, 'info');
+    }
+
     sendResponse({ ok: true });
   })().catch(async (err) => {
     await addLog(`Error: ${String(err?.message || err)}`, 'error');
